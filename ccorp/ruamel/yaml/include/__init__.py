@@ -6,6 +6,7 @@ import ruamel.yaml
 import ruamel.yaml.composer
 import ruamel.yaml.constructor
 from ruamel.yaml.nodes import ScalarNode, MappingNode, SequenceNode
+from ruamel.yaml.compat import StringIO
 
 
 class CompositingComposer(ruamel.yaml.composer.Composer):
@@ -99,7 +100,15 @@ class YAML(ruamel.yaml.YAML):
         yaml = type(self)(typ=self.typ, pure=self.pure)
         yaml.composer.anchors = self.composer.anchors
         return yaml
-
+    
+    def dumps(self, data, stream=None, **kw):
+        inefficient = False
+        if stream is None:
+            inefficient = True
+            stream = StringIO()
+        YAML.dump(self, data, stream, **kw)
+        if inefficient: return stream.getvalue()
+        return stream
 
 def include_compositor(self, anchor):
     event = self.parser.get_event()
