@@ -59,7 +59,7 @@ class ExcludingConstructor(ruamel.yaml.constructor.Constructor):
 class YAML(ruamel.yaml.YAML):
     def __init__(self, *args, **kwargs):
         if 'typ' not in kwargs:
-            kwargs['typ'] = 'safe'
+            kwargs['typ'] = ['safe']
         elif kwargs['typ'] not in ('safe', 'unsafe') and kwargs['typ'] not in (['safe'], ['unsafe']):
             raise Exception("Can't do typ={} parsing w/ composition time directives!".format(kwargs['typ']))
         
@@ -105,7 +105,7 @@ def include_compositor(self, anchor):
     event = self.parser.get_event()
     yaml = self.loader.fork()
     path = os.path.join(os.path.dirname(self.loader.reader.name), event.value)
-    with open(os.path.abspath(path)) as f:
+    with open(os.path.abspath(path), encoding='utf-8') as f:
         return yaml.compose(f)
 
 
@@ -128,5 +128,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    with open(args.file) as f:
+    with open(args.file, encoding='utf-8') as f:
         pprint.pprint(yaml.load(f))
